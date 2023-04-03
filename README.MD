@@ -1,4 +1,11 @@
-# This code reads all XML files that are located in a folder called "XML", at the same level of the "app.py":
+# XML Analyzer
+
+## This script was created to read multiple XML files and extract data.
+## Works with XML files from Cellebrite extractions.
+## Feel free to clone the repository and adapt it to your needs. 
+
+
+### This code reads all XML files that are located in a folder called "XML", at the same level of the "app.py" and saves data to a SQLITE DB as shown below:
 
 
 #### get_infos(): returns a {DICT}
