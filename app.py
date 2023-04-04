@@ -75,10 +75,10 @@ class Read_xml():
         global file_physical
         file_physical = xml.replace(self.directory, "").replace("\\", "")
 
-        if (physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI']", xmlns)) is None:
-            imei_fisico = "Vazio"
+        if (physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI1']", xmlns)) is None:
+            imei_physical = physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI']", xmlns).text
         else:
-            imei_fisico = physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI']", xmlns).text
+            imei_physical = physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI1']", xmlns).text
 
         if (physical.find("ns:metadata/[@section='Extraction Data']/ns:item/[@name='DeviceInfoSelectedManufacturer']", xmlns)) is None:
             brand = "Vazio"
@@ -111,7 +111,7 @@ class Read_xml():
             mac_address = physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='Mac Address']", xmlns).text
 
         return {"File": file_physical, 
-                "IMEI": imei_fisico, 
+                "IMEI": imei_physical, 
                 "Brand": brand,
                 "Model": model,
                 "FactoryNumber": factory_number,
@@ -125,13 +125,24 @@ class Read_xml():
         for x in logical.findall("./report/general_information"):
             global file, imei
             file = xml.replace(self.directory, "").replace("\\", "")
-            imei = x.find('imei').text
+
+            if x.find('imei') is None:
+                imei = "IMEI Não encontrado"
+            else:
+                imei = x.find('imei').text
 
         contacts = []
         for i in logical.findall("./report/contacts/contact"):
-            contact_name = i.find('name').text
-            contact_phone = i.find('phone_number').find('value').text
-            
+            if i.find('name') is None:
+                contact_name = "Vazio"
+            else: 
+                contact_name = i.find('name').text
+
+            if i.find('phone_number') is None:
+                contact_phone = "Vazio"
+            else:
+                contact_phone = i.find('phone_number').find('value').text
+
             dict_contacts = {"File": file,
                              "IMEI": imei,
                              "ContactName": contact_name,
@@ -145,15 +156,16 @@ class Read_xml():
 
         global file_physical
         file_physical = xml.replace(self.directory, "").replace("\\", "")
+        global imei_physical
 
         list_wifis = physical.findall("ns:decodedData/ns:modelType/[@type='WirelessNetwork']/", xmlns)
 
         wifis = []
         for wifi in list_wifis:
-            if (physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI']", xmlns)) is None:
-                imei_physical = "Vazio"
-            else:
+            if (physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI1']", xmlns)) is None:
                 imei_physical = physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI']", xmlns).text
+            else:
+                imei_physical = physical.find("ns:metadata/[@section='Device Info']/ns:item/[@name='IMEI1']", xmlns).text
                 
             if wifi.find("ns:field/[@name='SSId']/ns:value", xmlns) is None:
                 ssid = "Vazio"
@@ -196,7 +208,7 @@ if __name__ == "__main__":
     else:
         createDB(db_name)
 
-    print("\nProcess started:" + str(datetime.now()))
+    print("\nProcess started: " + str(datetime.now()))
 
     process = Read_xml(source_directory)
     all_files = process.all_files()
@@ -228,4 +240,4 @@ if __name__ == "__main__":
                     print(str(_) + "  =>  This file is already registered (Contacts Data)")
     con.close()
 
-    print("Process finished:" + str(datetime.now()))
+    print("Process finished: " + str(datetime.now()))
